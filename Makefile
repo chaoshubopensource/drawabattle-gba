@@ -8,6 +8,10 @@ ifeq ($(strip $(DEVKITARM)),)
 $(error DEVKITARM não está definido. Instale devkitPro (dkp-pacman -S gba-dev) e exporte DEVKITARM)
 endif
 
+# DEVKITPRO (pasta que contém libgba/) normalmente já vem definida pelo
+# instalador/imagem devkitPro; se não vier, assume o padrão (pai de devkitARM).
+DEVKITPRO ?= $(abspath $(DEVKITARM)/..)
+
 TARGET   := drawabattle
 BUILD    := build
 SOURCES  := source
@@ -17,9 +21,11 @@ CC       := $(PREFIX)gcc
 OBJCOPY  := $(PREFIX)objcopy
 GBAFIX   := $(DEVKITARM)/bin/gbafix
 
+LIBGBA   := $(DEVKITPRO)/libgba
+
 ARCH     := -mthumb-interwork -mthumb
-CFLAGS   := -g -Wall -O2 -mcpu=arm7tdmi -mtune=arm7tdmi $(ARCH) -fomit-frame-pointer
-LDFLAGS  := -g $(ARCH) -specs=gba.specs
+CFLAGS   := -g -Wall -O2 -mcpu=arm7tdmi -mtune=arm7tdmi $(ARCH) -fomit-frame-pointer -I$(LIBGBA)/include
+LDFLAGS  := -g $(ARCH) -specs=gba.specs -L$(LIBGBA)/lib
 
 SRCS := $(wildcard $(SOURCES)/*.c)
 OBJS := $(patsubst $(SOURCES)/%.c,$(BUILD)/%.o,$(SRCS))
